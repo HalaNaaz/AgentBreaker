@@ -1,0 +1,260 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:7a306db8-f19c-4eda-a323-63f2dd6f8f71",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-11-13T08:00:00Z",
+    "tools": [
+      {
+        "name": "AgentBreaker Release SBOM Generator",
+        "version": "1.0.0"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "name": "AgentBreaker",
+      "version": "0.1.0-dev",
+      "description": "AI Security Evaluation, Red Teaming & Vulnerability Assessment Platform",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "supplier": {
+        "name": "AshlynxCyber Security Systems"
+      }
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "ecosystem": "pypi",
+      "name": "typer",
+      "specifier": "typer>=0.12.0"
+    },
+    {
+      "type": "library",
+      "ecosystem": "pypi",
+      "name": "rich",
+      "specifier": "rich>=13.7.0"
+    },
+    {
+      "type": "library",
+      "ecosystem": "pypi",
+      "name": "pydantic",
+      "specifier": "pydantic>=2.6.0"
+    },
+    {
+      "type": "library",
+      "ecosystem": "pypi",
+      "name": "pydantic-settings",
+      "specifier": "pydantic-settings>=2.2.0"
+    },
+    {
+      "type": "library",
+      "ecosystem": "pypi",
+      "name": "httpx",
+      "specifier": "httpx>=0.27.0"
+    },
+    {
+      "type": "library",
+      "ecosystem": "pypi",
+      "name": "pyyaml",
+      "specifier": "pyyaml>=6.0.1"
+    },
+    {
+      "type": "library",
+      "ecosystem": "pypi",
+      "name": "python-dotenv",
+      "specifier": "python-dotenv>=1.0.0"
+    },
+    {
+      "type": "library",
+      "ecosystem": "pypi",
+      "name": "jinja2",
+      "specifier": "jinja2>=3.1.3"
+    },
+    {
+      "type": "library",
+      "ecosystem": "pypi",
+      "name": "fastapi",
+      "specifier": "fastapi>=0.110.0"
+    },
+    {
+      "type": "library",
+      "ecosystem": "pypi",
+      "name": "uvicorn[standard]",
+      "specifier": "uvicorn[standard]>=0.28.0"
+    },
+    {
+      "type": "library",
+      "ecosystem": "pypi",
+      "name": "websockets",
+      "specifier": "websockets>=12.0"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "@hookform/resolvers",
+      "version": "^3.9.1",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "@tanstack/react-table",
+      "version": "^8.20.5",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "@thesvg/ui",
+      "version": "^4.4.0",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "@thesvg/ui-react",
+      "version": "^4.4.0",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "clsx",
+      "version": "^2.1.1",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "framer-motion",
+      "version": "^11.11.11",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "lucide-react",
+      "version": "^0.454.0",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "next",
+      "version": "15.5.29",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "react",
+      "version": "^18.3.1",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "react-dom",
+      "version": "^18.3.1",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "react-hook-form",
+      "version": "^7.53.1",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "recharts",
+      "version": "^2.13.0",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "tailwind-merge",
+      "version": "^2.5.4",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "zod",
+      "version": "^4.6.7",
+      "scope": "runtime"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "@types/node",
+      "version": "^20.17.0",
+      "scope": "development"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "@types/react",
+      "version": "^18.3.12",
+      "scope": "development"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "@types/react-dom",
+      "version": "^18.3.1",
+      "scope": "development"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "autoprefixer",
+      "version": "^10.4.20",
+      "scope": "development"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "eslint",
+      "version": "^8.57.1",
+      "scope": "development"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "eslint-config-next",
+      "version": "15.5.29",
+      "scope": "development"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "postcss",
+      "version": "^8.5.32",
+      "scope": "development"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "tailwindcss",
+      "version": "^3.4.14",
+      "scope": "development"
+    },
+    {
+      "type": "library",
+      "ecosystem": "npm",
+      "name": "typescript",
+      "version": "^5.6.3",
+      "scope": "development"
+    }
+  ]
+}

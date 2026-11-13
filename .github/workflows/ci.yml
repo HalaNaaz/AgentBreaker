@@ -1,0 +1,70 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-test:
+    name: Backend Lint, Audit & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install Dependencies
+        run: uv sync --frozen
+
+      - name: Run Ruff Lint & Format Checks
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Run Pytest Suite with Coverage
+        run: |
+          uv run pytest --cov=agentbreaker --cov-report=term-missing
+
+  frontend-test:
+    name: Frontend Lint, Type-Check & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: bun install --frozen-lockfile
+
+      - name: Audit Frontend Dependencies
+        working-directory: frontend
+        run: bun audit
+
+      - name: Type-Check Frontend
+        working-directory: frontend
+        run: bun run type-check
+
+      - name: Lint Frontend
+        working-directory: frontend
+        run: bun run lint
+
+      - name: Build Next.js Production Bundle
+        working-directory: frontend
+        run: bun run build
