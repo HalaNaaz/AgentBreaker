@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Official Brand Palette */
+  --color-brand-grey: #ECECEC;
+  --color-brand-olive: #84934A;
+  --color-brand-deep-olive: #656D3F;
+  --color-brand-maroon: #492828;
+
+  /* Supporting Interface Colours */
+  --color-navy: #203653;
+  --color-blue: #477D9C;
+  --color-white: #FFFFFF;
+  --color-mint: #F1F7ED;
+  --color-mint-soft: #E7F2EB;
+
+  /* Semantic UI Tokens */
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #E7F2EB;
+  --color-surface-subtle: #F1F7ED;
+  --color-text-primary: #203653;
+  --color-text-secondary: #477D9C;
+  --color-text-muted: #70757D;
+  --color-border: #203653;
+  --color-action-primary: #84934A;
+  --color-action-secondary: #656D3F;
+
+  /* Status Tokens */
+  --color-status-success: #16A34A;
+  --color-status-warning: #D97706;
+  --color-status-error: #DC2626;
+  --color-status-info: #477D9C;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-brand-grey);
+    background-image: radial-gradient(var(--color-navy) 0.75px, transparent 0.75px);
+    background-size: 16px 16px;
+    color: var(--color-text-primary);
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-space-grotesk), sans-serif;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+  }
+}
+
+/* Technical Workstation Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-brand-grey);
+  border-left: 1px solid var(--color-navy);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-olive);
+  border: 1px solid var(--color-navy);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-deep-olive);
+}
+
+/* Tactical Component Utilities */
+.tactical-card {
+  background-color: #FFFFFF;
+  border: 2px solid #203653;
+  box-shadow: 3px 3px 0px #203653;
+  border-radius: 10px;
+}
+
+.tactical-card-mint {
+  background-color: #E7F2EB;
+  border: 2px solid #203653;
+  box-shadow: 3px 3px 0px #203653;
+  border-radius: 10px;
+}
+
+.tactical-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #203653;
+  box-shadow: 2px 2px 0px #203653;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.tactical-btn:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #203653;
+}
+
+.tactical-btn:active:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #203653;
+}
+
+.tactical-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.tactical-btn-primary {
+  background-color: #84934A;
+  color: #FFFFFF;
+}
+
+.tactical-btn-primary:hover:not(:disabled) {
+  background-color: #656D3F;
+}
+
+.tactical-btn-secondary {
+  background-color: #FFFFFF;
+  color: #203653;
+}
+
+.tactical-btn-secondary:hover:not(:disabled) {
+  background-color: #F1F7ED;
+}
+
+.tactical-btn-danger {
+  background-color: #DC2626;
+  color: #FFFFFF;
+}
+
+.tactical-btn-danger:hover:not(:disabled) {
+  background-color: #B91C1C;
+}
+
+.tactical-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1.5px solid #203653;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+

@@ -1,0 +1,52 @@
+<section class="section-card">
+  <div class="section-header">
+    <h2>1. Executive Summary</h2>
+  </div>
+  <p class="summary-lead">{{ report.executive_summary.verdict_summary }}</p>
+
+  <div class="metrics-grid">
+    <div class="stat-card">
+      <div class="stat-label">TOTAL EVALUATIONS</div>
+      <div class="stat-val">{{ report.executive_summary.total_evaluations }}</div>
+      <div class="stat-sub">Adversarial vectors</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">CRITICAL SEVERITY</div>
+      <div class="stat-val text-red">{{ report.executive_summary.critical_vulnerabilities }}</div>
+      <div class="stat-sub">Immediate risk</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">HIGH SEVERITY</div>
+      <div class="stat-val text-orange">{{ report.executive_summary.high_vulnerabilities }}</div>
+      <div class="stat-sub">Elevated risk</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">MEDIUM / LOW</div>
+      <div class="stat-val text-blue">{{ report.executive_summary.medium_vulnerabilities + report.executive_summary.low_vulnerabilities }}</div>
+      <div class="stat-sub">Controlled impact</div>
+    </div>
+  </div>
+
+  {% if report.executive_summary.confirmed_compromises %}
+  <div class="alert-box alert-danger">
+    <div class="alert-title">Confirmed Compromise Highlights:</div>
+    <ul>
+      {% for comp in report.executive_summary.confirmed_compromises %}
+      <li>{{ comp }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% if report.executive_summary.remediation_priorities %}
+  <div class="sub-block">
+    <h3>Recommended Remediation Priorities</h3>
+    <ol class="priorities-list">
+      {% for prio in report.executive_summary.remediation_priorities %}
+      <li>{{ prio }}</li>
+      {% endfor %}
+    </ol>
+  </div>
+  {% endif %}
+</section>
+

@@ -1,0 +1,63 @@
+<section class="section-card">
+  <div class="section-header">
+    <h2>7. Granular Technical Findings</h2>
+  </div>
+
+  {% if not report.findings %}
+  <p class="empty-notice">No evaluation findings recorded for this assessment.</p>
+  {% else %}
+  <div class="findings-container">
+    {% for f in report.findings %}
+    <div class="finding-card {% if f.verdict.value == 'VULNERABLE' %}finding-vulnerable{% elif f.verdict.value == 'DEFENDED' %}finding-defended{% else %}finding-inconclusive{% endif %}">
+      <div class="finding-header">
+        <div>
+          <span class="finding-id">{{ f.finding_id }}</span>
+          {% if f.is_variant %}
+          <span class="badge badge-variant">Variant (Parent: {{ f.parent_id }})</span>
+          {% endif %}
+        </div>
+        <div class="finding-badges">
+          <span class="badge badge-verdict-{{ f.verdict.value.lower() }}">{{ f.verdict.value }}</span>
+          <span class="badge badge-severity-{{ f.severity.value.lower() }}">{{ f.severity.value | upper }}</span>
+          <span class="badge badge-neutral">CVSS {{ "%.1f"|format(f.cvss_score) }}</span>
+          <span class="badge badge-neutral">Conf: {{ "%.2f"|format(f.confidence) }}</span>
+        </div>
+      </div>
+
+      <div class="finding-meta">
+        <div><strong>Payload ID:</strong> <code>{{ f.payload_id }}</code></div>
+        <div><strong>Category:</strong> {{ f.category.value }}</div>
+        {% if f.owasp_id %}<div><strong>OWASP:</strong> {{ f.owasp_id }}</div>{% endif %}
+        {% if f.mitre_atlas_id %}<div><strong>MITRE ATLAS:</strong> {{ f.mitre_atlas_id }}</div>{% endif %}
+      </div>
+
+      {% if f.reasons %}
+      <div class="finding-reasons">
+        <strong>Evaluator Verdict Rationales:</strong>
+        <ul>
+          {% for r in f.reasons %}
+          <li>{{ r }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if f.tool_call_violations %}
+      <div class="finding-violations text-red">
+        <strong>Unauthorized Tool Violations:</strong>
+        <code>{{ f.tool_call_violations | join(', ') }}</code>
+      </div>
+      {% endif %}
+
+      {% if f.detected_canaries %}
+      <div class="finding-violations text-red">
+        <strong>Leaked Canary Tokens:</strong>
+        <code>{{ f.detected_canaries | join(', ') }}</code>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+

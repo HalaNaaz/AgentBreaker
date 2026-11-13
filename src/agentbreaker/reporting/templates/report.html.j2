@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentBreaker Audit Report: {{ report.assessment_id }}</title>
+  <style>
+    :root {
+      --brand-grey: #ECECEC;
+      --brand-olive: #84934A;
+      --brand-deep-olive: #656D3F;
+      --brand-maroon: #492828;
+      --navy: #203653;
+      --blue: #477D9C;
+      --mint: #F1F7ED;
+      --mint-soft: #E7F2EB;
+      --white: #FFFFFF;
+      --red: #DC2626;
+      --orange: #D97706;
+      --green: #16A34A;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: var(--brand-grey);
+      color: var(--navy);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      padding: 30px 20px;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    header.report-header {
+      background: var(--navy);
+      color: var(--white);
+      padding: 24px 30px;
+      border-radius: 10px;
+      border: 2px solid var(--navy);
+      box-shadow: 4px 4px 0px rgba(32, 54, 83, 0.4);
+      margin-bottom: 25px;
+    }
+    header .org-badge {
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--brand-olive);
+      font-weight: 700;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      margin: 8px 0;
+      letter-spacing: -0.02em;
+    }
+    header .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 0.85rem;
+      color: #A3BFD1;
+      margin-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 12px;
+    }
+    .section-card {
+      background: var(--white);
+      border: 2px solid var(--navy);
+      box-shadow: 3px 3px 0px var(--navy);
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .section-header h2 {
+      font-size: 1.3rem;
+      color: var(--navy);
+      border-bottom: 2px solid var(--brand-grey);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .summary-lead {
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin-bottom: 20px;
+      color: var(--navy);
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--mint-soft);
+      border: 1.5px solid var(--navy);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+    .stat-val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+    .stat-sub {
+      font-size: 0.75rem;
+      color: #64748B;
+    }
+    .text-red { color: var(--red); }
+    .text-orange { color: var(--orange); }
+    .text-green { color: var(--green); }
+    .text-blue { color: var(--blue); }
+
+    .alert-box {
+      border: 1.5px solid var(--navy);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+    }
+    .alert-danger {
+      background: #FEE2E2;
+      border-color: var(--red);
+    }
+    .alert-title {
+      font-weight: 700;
+      color: var(--red);
+      margin-bottom: 6px;
+    }
+    .alert-box ul {
+      margin-left: 20px;
+      font-size: 0.9rem;
+    }
+    ol.priorities-list, ul.clean-list {
+      margin-left: 24px;
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+    ol.priorities-list li, ul.clean-list li {
+      margin-bottom: 6px;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px 0;
+      font-size: 0.9rem;
+    }
+    table.data-table th, table.data-table td {
+      border: 1px solid #CBD5E1;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    table.data-table th {
+      background: var(--mint-soft);
+      font-weight: 700;
+      color: var(--navy);
+    }
+    table.data-table tr:nth-child(even) td {
+      background: #F8FAFC;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border: 1px solid var(--navy);
+    }
+    .badge-verdict-vulnerable { background: #FEE2E2; color: var(--red); border-color: var(--red); }
+    .badge-verdict-defended { background: #DCFCE7; color: var(--green); border-color: var(--green); }
+    .badge-verdict-inconclusive { background: #FEF3C7; color: var(--orange); border-color: var(--orange); }
+    .badge-severity-critical { background: #7F1D1D; color: var(--white); }
+    .badge-severity-high { background: var(--red); color: var(--white); }
+    .badge-severity-medium { background: var(--orange); color: var(--white); }
+    .badge-severity-low { background: var(--blue); color: var(--white); }
+    .badge-neutral { background: var(--brand-grey); color: var(--navy); }
+    .badge-variant { background: #E0E7FF; color: #3730A3; }
+
+    .findings-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .finding-card {
+      border: 1.5px solid var(--navy);
+      border-radius: 8px;
+      padding: 16px;
+      background: #FFFFFF;
+    }
+    .finding-vulnerable { border-left: 6px solid var(--red); }
+    .finding-defended { border-left: 6px solid var(--green); }
+    .finding-inconclusive { border-left: 6px solid var(--orange); }
+    .finding-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .finding-id {
+      font-family: monospace;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .finding-badges {
+      display: flex;
+      gap: 6px;
+    }
+    .finding-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      font-size: 0.85rem;
+      color: #475569;
+      background: #F8FAFC;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .finding-reasons {
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+    .finding-reasons ul {
+      margin-left: 20px;
+      margin-top: 4px;
+    }
+    .finding-violations {
+      font-size: 0.85rem;
+      margin-top: 8px;
+      font-family: monospace;
+    }
+
+    footer.report-footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #64748B;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #CBD5E1;
+    }
+
+    @media print {
+      body { background: #FFFFFF; padding: 0; }
+      .section-card { box-shadow: none; border: 1px solid #000000; page-break-inside: avoid; }
+      header.report-header { box-shadow: none; border: 1px solid #000000; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="report-header">
+      <div class="org-badge">AshlynxCyber Security Systems — AI Red Teaming</div>
+      <h1>AgentBreaker Security Assessment Audit Report</h1>
+      <div class="header-meta">
+        <div><strong>Assessment ID:</strong> {{ report.assessment_id }}</div>
+        <div><strong>Report ID:</strong> {{ report.report_id }}</div>
+        <div><strong>Target:</strong> {{ report.target_id }} ({{ report.target_model }})</div>
+        <div><strong>Provider:</strong> {{ report.target_provider }}</div>
+        <div><strong>Generated:</strong> {{ report.generated_at }}</div>
+      </div>
+    </header>
+
+    <!-- 1. Executive Summary -->
+    {% include "executive_summary.html.j2" %}
+
+    <!-- 2. Verdicts & Severity Breakdown -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2>2. Evaluation Metrics & Verdict Breakdown</h2>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Verdict Classification</th>
+            <th>Count</th>
+            <th>Proportion (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-verdict-vulnerable">VULNERABLE</span></td>
+            <td><strong>{{ report.verdicts.vulnerable }}</strong></td>
+            <td>{{ report.verdicts.vulnerable_rate }}%</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-verdict-defended">DEFENDED</span></td>
+            <td><strong>{{ report.verdicts.defended }}</strong></td>
+            <td>{{ report.verdicts.defended_rate }}%</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-verdict-inconclusive">INCONCLUSIVE</span></td>
+            <td><strong>{{ report.verdicts.inconclusive }}</strong></td>
+            <td>{{ report.verdicts.inconclusive_rate }}%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top: 20px; font-size: 1.05rem;">Severity Distribution (Confirmed Vulnerabilities)</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Severity Tier</th>
+            <th>Vulnerability Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="badge badge-severity-critical">CRITICAL</span></td><td>{{ report.severities.critical }}</td></tr>
+          <tr><td><span class="badge badge-severity-high">HIGH</span></td><td>{{ report.severities.high }}</td></tr>
+          <tr><td><span class="badge badge-severity-medium">MEDIUM</span></td><td>{{ report.severities.medium }}</td></tr>
+          <tr><td><span class="badge badge-severity-low">LOW</span></td><td>{{ report.severities.low }}</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 3. Attack Category Analysis -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2>3. Attack Category Analysis</h2>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Attack Category</th>
+            <th>Evaluated</th>
+            <th>Vulnerable</th>
+            <th>Defended</th>
+            <th>Inconclusive</th>
+            <th>Vulnerability Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cat in report.categories %}
+          <tr>
+            <td><strong>{{ cat.name }}</strong></td>
+            <td>{{ cat.total_evaluated }}</td>
+            <td class="text-red">{{ cat.vulnerable_count }}</td>
+            <td class="text-green">{{ cat.defended_count }}</td>
+            <td class="text-orange">{{ cat.inconclusive_count }}</td>
+            <td>{{ cat.vulnerability_rate }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 4. Mutation Analytics (if enabled) -->
+    {% if report.mutation_metrics and report.mutation_metrics.mutation_enabled %}
+    <section class="section-card">
+      <div class="section-header">
+        <h2>4. Adversarial Mutation & Lineage Analytics</h2>
+      </div>
+      <div class="metrics-grid">
+        <div class="stat-card">
+          <div class="stat-label">ORIGINAL BASELINE</div>
+          <div class="stat-val">{{ report.mutation_metrics.original_payload_count }}</div>
+          <div class="stat-sub">Baseline vectors</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">GENERATED VARIANTS</div>
+          <div class="stat-val text-blue">{{ report.mutation_metrics.variant_payload_count }}</div>
+          <div class="stat-sub">Mutated derivatives</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">BASELINE VULNERABLE</div>
+          <div class="stat-val text-red">{{ report.mutation_metrics.baseline_vulnerable_count }}</div>
+          <div class="stat-sub">Direct breaches</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">VARIANT VULNERABLE</div>
+          <div class="stat-val text-orange">{{ report.mutation_metrics.variant_vulnerable_count }}</div>
+          <div class="stat-sub">Mutation bypasses</div>
+        </div>
+      </div>
+      <p><strong>Strategies Employed:</strong> {{ report.mutation_metrics.strategies_used | join(', ') }}</p>
+    </section>
+    {% endif %}
+
+    <!-- 5. OWASP Coverage -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2>5. OWASP Top 10 for LLMs Coverage</h2>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Tested Status</th>
+            <th>Evaluated Vectors</th>
+            <th>Confirmed Vulnerabilities</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in report.owasp_coverage %}
+          <tr>
+            <td><strong>{{ o.title }}</strong></td>
+            <td>
+              {% if o.tested %}
+              <span class="badge badge-verdict-defended">Tested</span>
+              {% else %}
+              <span class="badge badge-neutral">Untested</span>
+              {% endif %}
+            </td>
+            <td>{{ o.evaluated_count }}</td>
+            <td class="{% if o.vulnerable_count > 0 %}text-red{% endif %}"><strong>{{ o.vulnerable_count }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 6. MITRE ATLAS Matrix -->
+    {% if report.mitre_coverage %}
+    <section class="section-card">
+      <div class="section-header">
+        <h2>6. MITRE ATLAS Matrix Mapping</h2>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Technique ID</th>
+            <th>Technique Name</th>
+            <th>Evaluated Cases</th>
+            <th>Confirmed Vulnerabilities</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in report.mitre_coverage %}
+          <tr>
+            <td><code>{{ m.technique_id }}</code></td>
+            <td>{{ m.technique_name }}</td>
+            <td>{{ m.evaluated_count }}</td>
+            <td class="{% if m.vulnerable_count > 0 %}text-red{% endif %}"><strong>{{ m.vulnerable_count }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    {% endif %}
+
+    <!-- 7. Technical Findings -->
+    {% include "technical_findings.html.j2" %}
+
+    <!-- 8. Limitations & Recommendations -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2>8. Limitations & Methodology Caveats</h2>
+      </div>
+      <ul class="clean-list">
+        {% for lim in report.limitations %}
+        <li>{{ lim }}</li>
+        {% endfor %}
+      </ul>
+
+      <h3 style="margin-top: 20px; font-size: 1.1rem; color: var(--navy);">Recommendations</h3>
+      <ul class="clean-list">
+        {% for rec in report.recommendations %}
+        <li>{{ rec }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <footer class="report-footer">
+      <div>AgentBreaker AI Security Evaluation Platform — Confidential Research Artifact</div>
+      <div>Generated via AshlynxCyber Offline Evaluation Engine | Zero External Assets Loaded</div>
+    </footer>
+  </div>
+</body>
+</html>
+
