@@ -44,7 +44,7 @@ With 130 passing unit and adversarial tests (2 conditionally skipped for live da
 
 ## 3. Adversarial Security Testing
 
-A dedicated test suite, [`tests/mutators/test_adversarial_security.py`](file:///c:/Users/Hala/Downloads/Project%20Files/AgentBreaker/tests/mutators/test_adversarial_security.py), was executed to evaluate edge-case attacks and malformed inputs:
+A dedicated test suite, [`tests/mutators/test_adversarial_security.py`](../../../tests/mutators/test_adversarial_security.py), was executed to evaluate edge-case attacks and malformed inputs:
 
 1. **Empty & Whitespace Payloads:** Evaluated payloads with empty strings and whitespace sequences (`"   \t\n  "`). Both immediately trigger `InvalidPayloadError`.
 2. **Extreme Unicode & Control Characters:** Evaluated payloads containing null bytes (`\x00`), Right-to-Left Override markers (`\u202e`), zero-width spaces (`\u200b`), mathematical Fraktur characters, CJK ideographs, Cyrillic scripts, and emojis. All 4 strategies processed extreme Unicode without data corruption or crashes.
@@ -70,7 +70,7 @@ During the independent audit, four weaknesses were identified in the initial Pha
 
 ### Finding 1: Variant ID Collision on Long Parent IDs (Severity: Medium)
 - **Description:** `generate_variant_id` truncated long parent IDs exceeding `32 - len(suffix)` characters using simple slicing (`parent_id[:max_parent_len]`). If two distinct parent IDs shared a long common prefix (e.g. `INDIRECT_INJECTION_SEARCH_RES_A` and `INDIRECT_INJECTION_SEARCH_RES_B`), their truncated stems became identical, resulting in duplicate variant IDs in the attack runner or registry.
-- **Remediation:** Updated `generate_variant_id` in [`src/agentbreaker/mutators/base.py`](file:///c:/Users/Hala/Downloads/Project%20Files/AgentBreaker/src/agentbreaker/mutators/base.py) to incorporate a 3-character SHA-256 hash of the full parent ID (`parent_hash = hashlib.sha256(parent_id.encode()).hexdigest()[:3].upper()`) whenever truncation is required.
+- **Remediation:** Updated `generate_variant_id` in [`src/agentbreaker/mutators/base.py`](../../../src/agentbreaker/mutators/base.py) to incorporate a 3-character SHA-256 hash of the full parent ID (`parent_hash = hashlib.sha256(parent_id.encode()).hexdigest()[:3].upper()`) whenever truncation is required.
 - **Verification:** Verified by `test_adversarial_collision_resistance_on_long_similar_ids`.
 
 ### Finding 2: Potential Secret Leakage in Mutation Metadata (Severity: Medium)
