@@ -1,7 +1,7 @@
 # AgentBreaker — API Reference Manual
 
 **Product:** AgentBreaker  
-**Version:** 0.1.0.dev1  
+**Version:** 0.1.0  
 **Protocol:** HTTP/1.1 REST & WebSocket  
 **Default Base URL:** `http://127.0.0.1:8000`
 
@@ -15,7 +15,7 @@ Checks operational station health.
   ```json
   {
     "status": "ok",
-    "version": "0.1.0.dev1",
+    "version": "0.1.0",
     "runtime_status": "healthy",
     "storage_available": true,
     "engine_available": true,
@@ -30,7 +30,7 @@ Returns framework operational metadata with zero credential disclosure.
   {
     "name": "AgentBreaker",
     "organization": "AshlynxCyber",
-    "version": "0.1.0.dev1",
+    "version": "0.1.0",
     "python_runtime": "CPython 3.12.13",
     "os_platform": "Windows 11 (AMD64)",
     "registered_connectors": ["openai_compatible", "ollama", "openai", "gemini", "anthropic", "custom_http"],
