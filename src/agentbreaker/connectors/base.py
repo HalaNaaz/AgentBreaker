@@ -10,6 +10,7 @@ from urllib.parse import urljoin, urlparse
 
 import httpx
 
+from agentbreaker import __version__
 from agentbreaker.connectors.exceptions import (
     AuthenticationError,
     ConnectorError,
@@ -116,7 +117,7 @@ class BaseConnector(ABC):
         timeout = httpx.Timeout(self.config.timeout_seconds)
 
         headers = {
-            "User-Agent": "AgentBreaker-Security-Scanner/0.1.0-dev",
+            "User-Agent": f"AgentBreaker-Security-Scanner/{__version__}",
             "Accept": "application/json",
             **self.config.get_auth_header(),
             **self.config.custom_headers,
