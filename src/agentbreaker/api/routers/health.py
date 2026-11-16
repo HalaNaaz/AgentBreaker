@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends
 
+from agentbreaker import __version__
 from agentbreaker.api.dependencies import get_storage
 from agentbreaker.api.schemas.responses import HealthResponse
 from agentbreaker.cli.storage import StorageManager
@@ -26,7 +27,7 @@ async def check_health(storage: StorageManager = Depends(get_storage)) -> Health
     storage_ok = storage.targets_dir.exists() and storage.assessments_dir.exists()
     return HealthResponse(
         status="ok",
-        version="0.1.0.dev1",
+        version=__version__,
         runtime_status="healthy",
         storage_available=storage_ok,
         engine_available=True,

@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  backend-test:
-    name: Backend Lint, Audit & Test
+  backend-unit:
+    name: Backend Lint, Audit & Unit Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -35,9 +35,66 @@ jobs:
           uv run ruff check .
           uv run ruff format --check .
 
-      - name: Run Pytest Suite with Coverage
+      - name: Run Deterministic Unit Tests with Coverage
         run: |
-          uv run pytest --cov=agentbreaker --cov-report=term-missing
+          uv run pytest -m "not integration" --cov=agentbreaker --cov-report=term-missing
+
+  windows-dpapi:
+    name: Windows Native DPAPI Integration
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install Dependencies
+        run: uv sync --frozen --extra dev
+
+      - name: Run Windows Native DPAPI Integration Tests
+        run: |
+          uv run pytest -m "windows" -v
+
+  linux-secret-service:
+    name: Linux Native Secret Service Integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Secret Service & D-Bus Packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnome-keyring dbus-x11 python3-secretstorage libsecret-1-0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install Dependencies
+        run: uv sync --frozen --extra dev
+
+      - name: Run Linux Native Secret Service Integration Tests
+        run: |
+          dbus-run-session bash -c '
+            eval $(echo -n "ci-secret-pass" | gnome-keyring-daemon --unlock 2>/dev/null || true)
+            export $(gnome-keyring-daemon --start --components=secrets 2>/dev/null || true)
+            uv run pytest -m "linux" -v
+          '
 
   frontend-test:
     name: Frontend Lint, Type-Check & Build

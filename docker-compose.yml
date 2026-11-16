@@ -1,0 +1,56 @@
+# AgentBreaker Local Scanner & Isolated Test Target Orchestration
+# Designed for private, local-first red teaming per PRD §14
+services:
+  agentbreaker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: agentbreaker:0.1.0
+    container_name: agentbreaker-scanner
+    restart: unless-stopped
+    command: ["info"]
+    environment:
+      - AGENTBREAKER_HOME=/home/agentbreaker/.agentbreaker
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - agentbreaker-data:/home/agentbreaker/.agentbreaker
+    networks:
+      - scanner-net
+    # Bind to host loopback interface only (127.0.0.1) to prevent public network exposure
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  mock-target:
+    image: python:3.12-slim
+    container_name: agentbreaker-mock-target
+    restart: unless-stopped
+    command: >
+      python -c "
+      import http.server, socketserver, json
+      class MockLLMHandler(http.server.BaseHTTPRequestHandler):
+          def do_GET(self):
+              self.send_response(200)
+              self.send_header('Content-Type', 'application/json')
+              self.end_headers()
+              self.wfile.write(b'{\"status\": \"ready\", \"model\": \"mock-llama-3\"}')
+          def do_POST(self):
+              self.send_response(200)
+              self.send_header('Content-Type', 'application/json')
+              self.end_headers()
+              self.wfile.write(b'{\"choices\": [{\"message\": {\"content\": \"I cannot fulfill this request as it is against my safety guidelines.\"}}]}')
+      with socketserver.TCPServer(('0.0.0.0', 8080), MockLLMHandler) as httpd:
+          httpd.serve_forever()
+      "
+    networks:
+      - scanner-net
+    # Bound to host loopback interface only
+    ports:
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  agentbreaker-data:
+    driver: local
+
+networks:
+  scanner-net:
+    driver: bridge

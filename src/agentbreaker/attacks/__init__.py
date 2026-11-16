@@ -10,7 +10,7 @@ from agentbreaker.attacks.exceptions import (
     TargetNotAuthorizedError,
 )
 from agentbreaker.attacks.execution import AttackExecution
-from agentbreaker.attacks.loader import PayloadLoader
+from agentbreaker.attacks.loader import PayloadLoader, get_default_payloads_dir
 from agentbreaker.attacks.registry import AttackRegistry
 from agentbreaker.attacks.runner import AttackRunner
 
@@ -26,4 +26,5 @@ __all__ = [
     "PayloadLoader",
     "PayloadValidationError",
     "TargetNotAuthorizedError",
+    "get_default_payloads_dir",
 ]

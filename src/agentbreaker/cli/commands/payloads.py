@@ -6,7 +6,7 @@ from typing import Annotated
 import typer
 from rich.panel import Panel
 
-from agentbreaker.attacks.loader import PayloadLoader
+from agentbreaker.attacks.loader import PayloadLoader, get_default_payloads_dir
 from agentbreaker.cli.output import (
     console,
     create_table,
@@ -41,16 +41,17 @@ def list_payloads(
     severity: Annotated[
         Severity | None, typer.Option("--severity", "-s", help="Filter by severity level.")
     ] = None,
-    path: Annotated[Path, typer.Option("--path", "-p", help="Payload directory path.")] = Path(
-        "payloads"
-    ),
+    path: Annotated[
+        Path | None, typer.Option("--path", "-p", help="Payload directory path.")
+    ] = None,
 ) -> None:
     """List attack payloads with optional category and severity filtering."""
-    if not path.exists():
-        print_error(f"Payload directory '{path}' not found.")
+    target_path = path or get_default_payloads_dir()
+    if not target_path.exists():
+        print_error(f"Payload directory '{target_path}' not found.")
         raise typer.Exit(code=1)
 
-    payloads = _get_payloads(path)
+    payloads = _get_payloads(target_path)
 
     if category:
         payloads = [p for p in payloads if p.category == category]
@@ -89,16 +90,17 @@ def list_payloads(
 @payloads_app.command("show")
 def show_payload(
     payload_id: Annotated[str, typer.Argument(help="Identifier of payload to inspect.")],
-    path: Annotated[Path, typer.Option("--path", "-p", help="Payload directory path.")] = Path(
-        "payloads"
-    ),
+    path: Annotated[
+        Path | None, typer.Option("--path", "-p", help="Payload directory path.")
+    ] = None,
 ) -> None:
     """Inspect full details, template, and evaluation rules for a payload."""
-    payloads = _get_payloads(path)
+    target_path = path or get_default_payloads_dir()
+    payloads = _get_payloads(target_path)
     target = next((p for p in payloads if p.id == payload_id), None)
 
     if not target:
-        print_error(f"Payload '{payload_id}' not found in '{path}'.")
+        print_error(f"Payload '{payload_id}' not found in '{target_path}'.")
         raise typer.Exit(code=1)
 
     rules = target.evaluator_rules
@@ -165,18 +167,19 @@ def list_categories() -> None:
 @payloads_app.command("validate")
 def validate_payloads(
     path: Annotated[
-        Path, typer.Option("--path", "-p", help="Payload directory path to validate.")
-    ] = Path("payloads"),
+        Path | None, typer.Option("--path", "-p", help="Payload directory path to validate.")
+    ] = None,
 ) -> None:
     """Validate all payload files in directory against schema and safety bounds."""
-    print_header("Validating Payload Repository", f"Path: {path}")
+    target_path = path or get_default_payloads_dir()
+    print_header("Validating Payload Repository", f"Path: {target_path}")
 
-    if not path.is_dir():
-        print_error(f"Directory '{path}' does not exist.")
+    if not target_path.is_dir():
+        print_error(f"Directory '{target_path}' does not exist.")
         raise typer.Exit(code=1)
 
     try:
-        payloads = PayloadLoader.load_from_directory(path)
+        payloads = PayloadLoader.load_from_directory(target_path)
         print_success(f"All {len(payloads)} payloads loaded and validated successfully.")
     except Exception as err:
         print_error(f"Payload validation failed: {err}")

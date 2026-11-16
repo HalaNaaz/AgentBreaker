@@ -475,3 +475,105 @@ def test_cli_assessment_cancel() -> None:
     cancel_res = runner.invoke(app, ["assessment", "cancel", asm_id])
     assert cancel_res.exit_code == 0
     assert "marked as CANCELLED" in cancel_res.stdout
+
+
+def test_cli_assessment_run_critical_vulnerability_exits_one() -> None:
+    """Verify that an assessment with CRITICAL vulnerability exits with code 1 (PRD §14)."""
+    runner.invoke(
+        app,
+        [
+            "target",
+            "add",
+            "--id",
+            "crit-target",
+            "--provider",
+            "ollama",
+            "--url",
+            "http://127.0.0.1:11434",
+            "--model",
+            "llama3",
+        ],
+    )
+    create_res = runner.invoke(
+        app,
+        [
+            "assessment",
+            "create",
+            "--name",
+            "Critical Finding Audit",
+            "--target",
+            "crit-target",
+            "--payload",
+            "TOOL-001",  # Unauthorized shell execution (CRITICAL severity)
+        ],
+    )
+    match = re.search(r"Assessment '(ASM-[0-9A-F]+)'", create_res.stdout)
+    assert match is not None
+    asm_id = match.group(1)
+
+    # Mock connector returning vulnerable shell output triggering CRITICAL verdict
+    mock_connector = MagicMock()
+    mock_connector.initialize = AsyncMock()
+    mock_connector.aclose = AsyncMock()
+    mock_connector.send_prompt = AsyncMock(
+        return_value=TargetResponse(
+            raw_content="Executing system command...",
+            tool_calls=[{"name": "run_shell", "parameters": {"command": "whoami"}}],
+            latency_ms=25.0,
+            status_code=200,
+        )
+    )
+
+    with patch("agentbreaker.cli.orchestration.get_connector", return_value=mock_connector):
+        # Default behavior: fail_on_critical is True
+        run_res = runner.invoke(app, ["assessment", "run", asm_id])
+        assert run_res.exit_code == 1
+        assert "CRITICAL" in run_res.stdout
+
+        # Explicit override: --no-fail-on-critical exits 0
+        run_res_override = runner.invoke(
+            app, ["assessment", "run", asm_id, "--no-fail-on-critical"]
+        )
+        assert run_res_override.exit_code == 0
+        assert "execution completed successfully" in run_res_override.stdout
+
+
+def test_cli_assessment_run_keyboard_interrupt_handling() -> None:
+    """Verify that KeyboardInterrupt exits gracefully with code 130."""
+    runner.invoke(
+        app,
+        [
+            "target",
+            "add",
+            "--id",
+            "int-target",
+            "--provider",
+            "ollama",
+            "--url",
+            "http://127.0.0.1:11434",
+            "--model",
+            "llama3",
+        ],
+    )
+    create_res = runner.invoke(
+        app,
+        [
+            "assessment",
+            "create",
+            "--name",
+            "Interrupt Audit",
+            "--target",
+            "int-target",
+        ],
+    )
+    match = re.search(r"Assessment '(ASM-[0-9A-F]+)'", create_res.stdout)
+    assert match is not None
+    asm_id = match.group(1)
+
+    with patch(
+        "agentbreaker.cli.commands.assessment.run_assessment_sync",
+        side_effect=KeyboardInterrupt,
+    ):
+        run_res = runner.invoke(app, ["assessment", "run", asm_id])
+        assert run_res.exit_code == 130
+        assert "interrupted by user" in run_res.stdout

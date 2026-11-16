@@ -6,7 +6,7 @@ from typing import Annotated
 import typer
 from rich.panel import Panel
 
-from agentbreaker.attacks.loader import PayloadLoader
+from agentbreaker.attacks.loader import PayloadLoader, get_default_payloads_dir
 from agentbreaker.cli.output import (
     console,
     create_table,
@@ -60,23 +60,29 @@ def preview_mutation(
     strategy: Annotated[
         str,
         typer.Option(
-            "--strategy", "-s", help="Strategy (base64, rot13, leetspeak, markdown_obfuscation)."
+            "--strategy",
+            "-s",
+            help=(
+                "Strategy (base64, rot13, leetspeak, markdown_obfuscation, "
+                "ascii_smuggling, multilingual)."
+            ),
         ),
     ] = "rot13",
     max_variants: Annotated[
         int, typer.Option("--max-variants", "-m", help="Max variants to generate.")
     ] = 1,
     seed: Annotated[int | None, typer.Option("--seed", help="Deterministic random seed.")] = 42,
-    path: Annotated[Path, typer.Option("--path", "-p", help="Payload directory path.")] = Path(
-        "payloads"
-    ),
+    path: Annotated[
+        Path | None, typer.Option("--path", "-p", help="Payload directory path.")
+    ] = None,
 ) -> None:
     """Preview mutated adversarial variants without dispatching them to any target."""
-    if not path.is_dir():
-        print_error(f"Payload directory '{path}' not found.")
+    target_path = path or get_default_payloads_dir()
+    if not target_path.is_dir():
+        print_error(f"Payload directory '{target_path}' not found.")
         raise typer.Exit(code=1)
 
-    payloads = PayloadLoader.load_from_directory(path)
+    payloads = PayloadLoader.load_from_directory(target_path)
     base_payload = next((p for p in payloads if p.id == payload_id), None)
 
     if not base_payload:

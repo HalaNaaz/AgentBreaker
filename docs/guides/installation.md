@@ -3,7 +3,7 @@
 **Product:** AgentBreaker  
 **Brand:** AshlynxCyber Security Systems  
 **Audience:** Security Engineers, Penetration Testers, ML Researchers  
-**Supported Platforms:** Windows 11 / 10, macOS (Apple Silicon / Intel), Linux (Ubuntu 22.04+)
+**Supported Platforms:** Windows 11 / 10 (Verified), Linux Ubuntu 22.04+ / WSL2 (Verified), macOS (Apple Silicon / Intel - Unverified in automated CI)
 
 ---
 
@@ -57,8 +57,8 @@ Run the system diagnostic check:
 uv run agentbreaker system info
 ```
 Expected output displays:
-- AgentBreaker version (`0.1.0.dev1`)
-- Python runtime (`3.12.x`)
+- AgentBreaker version (`0.1.0`)
+- Python runtime (`3.11.x` / `3.12.x`)
 - OS vault status (e.g., `Windows DPAPI Available: True` or `Keyring Available: True`)
 - Active storage path (defaults to `~/.agentbreaker`)
 

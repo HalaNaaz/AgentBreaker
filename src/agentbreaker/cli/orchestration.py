@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from agentbreaker.attacks.base import BaseAttack
-from agentbreaker.attacks.loader import PayloadLoader
+from agentbreaker.attacks.loader import PayloadLoader, get_default_payloads_dir
 from agentbreaker.attacks.runner import AttackRunner
 from agentbreaker.cli.storage import storage
 from agentbreaker.connectors.factory import get_connector
@@ -25,10 +25,12 @@ class AssessmentOrchestrator:
 
     def __init__(
         self,
-        payloads_dir: Path | str = "payloads",
+        payloads_dir: Path | str | None = None,
         progress_callback: Callable[[int, int, str], None] | None = None,
     ) -> None:
-        self.payloads_dir = Path(payloads_dir)
+        self.payloads_dir = (
+            Path(payloads_dir) if payloads_dir is not None else get_default_payloads_dir()
+        )
         self.progress_callback = progress_callback
         self.oracle = EvaluationEngine()
         self.canary_tracker = CanaryTracker()
@@ -204,7 +206,7 @@ class AssessmentOrchestrator:
 
 def run_assessment_sync(
     assessment_config: dict[str, Any],
-    payloads_dir: Path | str = "payloads",
+    payloads_dir: Path | str | None = None,
     progress_callback: Callable[[int, int, str], None] | None = None,
 ) -> tuple[list[EvaluationResult], dict[str, Any]]:
     """Synchronous entry point to execute an assessment."""

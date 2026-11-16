@@ -62,13 +62,24 @@ On Windows (`win32`), AgentBreaker interfaces directly with `Crypt32.dll` via `c
 ### 2.2 POSIX: Linux Secret Service & macOS Keychain
 
 On Linux and macOS (`darwin`), AgentBreaker utilizes authentic OS keyrings via the `keyring` library (`keyring>=25.7.0`):
-- **macOS:** Binds directly to the native Apple Keychain (`keyring.backends.macOS.Keyring`).
-- **Linux:** Binds to the Freedesktop Secret Service standard over D-Bus (`SecretServiceKeyring`), interfacing with GNOME Keyring or KWallet.
+- **macOS:** Binds directly to the native Apple Keychain (`keyring.backends.macOS.Keyring`). *(Note: macOS environment is currently Not Tested).*
+- **Linux:** Binds to the Freedesktop Secret Service standard over D-Bus (`SecretServiceKeyring`), interfacing with GNOME Keyring or KWallet. *(Verified in CI under D-Bus session with GNOME Keyring).*
 - **Reference Scheme:** `vault://keyring/target_<target_id>`
 - **Fail-Closed Guarantee:**
   - In headless or containerized environments lacking an active Secret Service session, `keyring` resolves to `fail.Keyring` or a backend with non-positive priority.
   - When this occurs, `POSIXCredentialStore` raises `SecureStorageUnavailableError`.
   - **Insecure Fallback Prohibition:** The system **never falls back to plaintext or weak XOR obfuscation**.
+
+---
+
+### 2.3 Platform Support & Verification Status
+
+| Operating System | Credential Vault Subsystem | Verification Status | CI Runner / Execution Context |
+| :--- | :--- | :--- | :--- |
+| **Windows 10/11 / Server** | Windows DPAPI (`Crypt32.dll`) | **Verified** | `windows-latest` (`pytest -m "windows"`) |
+| **Linux (Ubuntu / Debian)** | D-Bus Secret Service (GNOME Keyring / KWallet) | **Verified** | `ubuntu-latest` (`dbus-run-session`, `pytest -m "linux"`) |
+| **macOS** | Apple Keychain Services | **Not Tested** | Out of scope for Phase 9.8 |
+| **Headless / Containerized** | Mock Keyring Fixture for deterministic unit tests | **Verified** | `ubuntu-latest` (`pytest -m "not integration"`) |
 
 ---
 
@@ -96,4 +107,22 @@ sudo apt-get install -y dbus gnome-keyring python3-keyring
 dbus-run-session -- agentbreaker target add my-target ...
 ```
 If a headless environment cannot provide a Secret Service session, targets should use environment variable references (`target_id` configured with an empty secret, and credentials provided via runtime environment variables).
+
+---
+
+## 5. Automated CI Verification & Test Isolation
+
+To prevent CI failures caused by missing desktop daemons while rigorously verifying authentic OS cryptography, AgentBreaker divides tests into deterministic unit tests and native integration tests:
+
+- **Deterministic Unit Tests (`-m "not integration"`):**
+  - Run automatically in standard headless CI (`ubuntu-latest`).
+  - Unit tests use an isolated mock keyring (`MockKeyringBackend`) in `tests/conftest.py` that verifies business logic, factory selection, migration workflows, and fail-closed error handling without requiring active desktop D-Bus daemons.
+  - Require $\ge 90\%$ code coverage.
+- **Windows DPAPI Native Integration (`-m "windows"`):**
+  - Runs on `windows-latest`.
+  - Verifies authentic Win32 `CryptProtectData` and `CryptUnprotectData`, DPAPI binary headers (`\x01\x00\x00\x00`), and non-plaintext vault files.
+- **Linux Secret Service Native Integration (`-m "linux"`):**
+  - Runs on `ubuntu-latest` inside `dbus-run-session` with `gnome-keyring-daemon --unlock`.
+  - Verifies live D-Bus Secret Service storage, retrieval, persistence across instances, and fail-closed behavior when the backend is unavailable.
+
 

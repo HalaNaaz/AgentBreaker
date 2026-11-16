@@ -2,6 +2,8 @@
 
 from fastapi.testclient import TestClient
 
+from agentbreaker import __version__
+
 
 def test_health_endpoints(client: TestClient) -> None:
     """Verify GET /health and GET /api/v1/health return consistent operational status."""
@@ -10,7 +12,7 @@ def test_health_endpoints(client: TestClient) -> None:
         assert res.status_code == 200
         data = res.json()
         assert data["status"] == "ok"
-        assert data["version"] == "0.1.0.dev1"
+        assert data["version"] == __version__
         assert data["runtime_status"] == "healthy"
         assert data["storage_available"] is True
         assert data["engine_available"] is True

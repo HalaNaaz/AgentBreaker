@@ -15,6 +15,25 @@ from agentbreaker.attacks.registry import AttackRegistry
 from agentbreaker.schemas.payload import AttackPayload
 
 
+def get_default_payloads_dir() -> Path:
+    """Discover default attack payloads directory.
+
+    Checks in order:
+    1. Local working directory './payloads' (if present and non-empty).
+    2. Bundled package directory 'agentbreaker/payloads'.
+    3. Fallback to Path('payloads').
+    """
+    cwd_payloads = Path.cwd() / "payloads"
+    if cwd_payloads.is_dir() and any(cwd_payloads.glob("**/*.yaml")):
+        return cwd_payloads
+
+    pkg_payloads = Path(__file__).resolve().parent.parent / "payloads"
+    if pkg_payloads.is_dir() and any(pkg_payloads.glob("**/*.yaml")):
+        return pkg_payloads
+
+    return cwd_payloads
+
+
 class PayloadLoader:
     """Safe filesystem loader for discovering and parsing YAML and JSON attack payloads."""
 

@@ -14,6 +14,7 @@ from agentbreaker.oracle.exceptions import (
 )
 from agentbreaker.oracle.judges.base import BaseJudge
 from agentbreaker.oracle.judges.llm_judge import LLMJudge
+from agentbreaker.oracle.metrics import OracleMetrics, compute_oracle_metrics
 from agentbreaker.oracle.registry import EvaluatorRegistry
 from agentbreaker.oracle.rules.canary import CanaryEvaluator, CanaryTracker
 from agentbreaker.oracle.rules.content_analysis import ContentAnalysisEvaluator
@@ -39,6 +40,8 @@ __all__ = [
     "JudgeEvaluationError",
     "LLMJudge",
     "OracleError",
+    "OracleMetrics",
     "RefusalEvaluator",
     "RegexEvaluator",
+    "compute_oracle_metrics",
 ]
