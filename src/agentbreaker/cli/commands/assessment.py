@@ -18,7 +18,7 @@ from agentbreaker.cli.output import (
     print_warning,
 )
 from agentbreaker.cli.storage import storage
-from agentbreaker.schemas.enums import AttackCategory, Verdict
+from agentbreaker.schemas.enums import AttackCategory, Severity, Verdict
 
 assessment_app = typer.Typer(
     name="assessment",
@@ -181,6 +181,13 @@ def show_assessment(
 @assessment_app.command("run")
 def run_assessment(
     assessment_id: Annotated[str, typer.Argument(help="Assessment identifier to execute.")],
+    fail_on_critical: Annotated[
+        bool,
+        typer.Option(
+            "--fail-on-critical/--no-fail-on-critical",
+            help="Exit with code 1 if CRITICAL vulnerabilities are detected (CI/CD gate).",
+        ),
+    ] = True,
 ) -> None:
     """Execute an assessment through connectors, attacks, mutators, and oracle."""
     a = storage.get_assessment(assessment_id)
@@ -222,6 +229,9 @@ def run_assessment(
                 assessment_config=a,
                 progress_callback=_progress_cb,
             )
+        except KeyboardInterrupt:
+            print_warning("\nAssessment execution interrupted by user.")
+            raise typer.Exit(code=130) from None
         except Exception as err:
             print_error(f"Assessment execution failed: {err}")
             raise typer.Exit(code=1) from err
@@ -254,11 +264,21 @@ def run_assessment(
 
     # Preview sample findings if any
     vuln_results = [r for r in results if r.verdict == Verdict.VULNERABLE]
+    critical_vulns = [r for r in vuln_results if r.severity == Severity.CRITICAL]
+
     if vuln_results:
         print_warning(
-            f"Detected {len(vuln_results)} security vulnerabilities! "
-            "View with: 'agentbreaker findings list'"
+            f"Detected {len(vuln_results)} security vulnerabilities "
+            f"({len(critical_vulns)} CRITICAL)! View with: 'agentbreaker findings list'"
         )
+
+    # PRD §14 CI/CD Quality Gate: exit 1 on critical findings
+    if fail_on_critical and critical_vulns:
+        print_error(
+            f"CI/CD Quality Gate Triggered: {len(critical_vulns)} "
+            "CRITICAL vulnerabilities detected."
+        )
+        raise typer.Exit(code=1)
 
 
 @assessment_app.command("cancel")
