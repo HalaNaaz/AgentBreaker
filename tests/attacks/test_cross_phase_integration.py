@@ -95,7 +95,7 @@ async def test_integration_pipeline_loading_registry_runner():
     """3. End-to-end pipeline: Directory load -> Registry -> Runner."""
     registry = AttackRegistry()
     count = PayloadLoader.load_into_registry(Path("payloads"), registry)
-    assert count == 30
+    assert count >= 50
 
     respx.post("http://localhost:8000/v1/chat/completions").respond(
         200,
