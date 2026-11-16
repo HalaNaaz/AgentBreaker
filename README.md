@@ -28,22 +28,25 @@ AgentBreaker operates **local-first** with zero cloud telemetry dependencies, fe
 
 ## Core Capabilities
 
-- **Multi-Category Attack Vector Suites:**
-  - `direct_jailbreak`: Resistance to adversarial framing, persona adoption, and refusal bypasses.
-  - `system_extraction`: Protection against hidden system prompt leakage and canary exfiltration.
-  - `indirect_injection`: Handling of untrusted documents, third-party data, and embedded instructions.
-  - `tool_hijacking`: Defense against unauthorized function calls, parameter injection, and agent subversion.
-- **Dynamic Mutation & Evasion Engine:**
+- **Multi-Category Attack Vector Suites (50 Bundled Vectors):**
+  - `direct_jailbreak`: Resistance to adversarial framing, persona adoption, and refusal bypasses (13 vectors).
+  - `system_extraction`: Protection against hidden system prompt leakage and canary exfiltration (12 vectors).
+  - `indirect_injection`: Handling of untrusted documents, third-party data, and embedded instructions (13 vectors).
+  - `tool_hijacking`: Defense against unauthorized function calls, parameter injection, and agent subversion (12 vectors).
+- **Dynamic Mutation & Evasion Engine (6 Strategies):**
   - Deterministic transformations: Base64 encoding, Leetspeak substitution, ROT13 Caesar cipher.
   - Obfuscation techniques: Markdown delimiter evasion, invisible zero-width character injection.
+  - ASCII smuggling: Unicode Plane 14 tag characters and zero-width bitstreams for printable ASCII.
+  - Multilingual evasion: Adversarial keyword substitution and language instruction framing across 5 languages (Spanish, French, German, Russian, Chinese; non-dictionary text remains in original language).
   - Full parent-child lineage tracking and preview generation without executing code.
 - **Multi-Tiered Evaluation Oracle:**
   - Deterministic pattern matching and 128-bit synthetic canary tracking (`AGY-CANARY-<HEX32>`).
   - Refusal heuristic classifiers with strict boundary enforcement.
+  - Regex evaluation provides high-speed heuristic filtering; optional `LLMJudgeEvaluator` provides semantic scoring for higher-assurance evaluation.
   - Passive model tool-call inspection (model tool calls are inspected but **never executed**).
   - Deterministic compromise precedence (`VULNERABLE` overrides tentative refusals).
 - **Enterprise-Grade Secret Management:**
-  - Hardware/OS-backed encrypted credential vaults (Windows DPAPI and Linux/macOS Keyring).
+  - Hardware/OS-backed encrypted credential vaults (Windows DPAPI and Linux Secret Service verified; macOS Keychain unverified in automated CI).
   - Automated migration and zeroization of plaintext keys on disk.
   - Strict SHA-256 masking of API tokens across all CLI logs, API responses, and exported reports.
 - **Dual-Interface Operation:**
@@ -185,7 +188,7 @@ AgentBreaker is engineered with strict controls for adversarial research environ
 
 1. **Passive Tool Safety:** Autonomous agent tool calls are inspected statically and **never executed**.
 2. **Loopback Isolation:** The REST API and WebSocket daemon strictly bind to `127.0.0.1`.
-3. **Encrypted Vault Storage:** Target credentials are encrypted with Windows DPAPI or POSIX Keyring before touching disk.
+3. **Encrypted Vault Storage:** Target credentials are encrypted with Windows DPAPI (Verified) or Linux Secret Service via D-Bus (Verified) before touching disk. Plaintext storage is strictly prohibited.
 4. **Session Security:** Web UI interactions utilize HttpOnly cookies, CSRF protection, and single-use WebSocket tickets.
 5. **Universal Output Sanitization:** All model responses and findings pass through centralized secret redaction.
 
@@ -196,8 +199,12 @@ AgentBreaker is engineered with strict controls for adversarial research environ
 Run the comprehensive test and linting suite:
 
 ```bash
-# Run backend pytest suite with statement coverage (90%+ required)
-uv run pytest --cov=agentbreaker
+# Run deterministic unit tests with statement coverage (90%+ required)
+uv run pytest -m "not integration" --cov=agentbreaker
+
+# Run native OS integration tests (platform-dependent)
+uv run pytest -m "windows"  # Windows DPAPI native integration
+uv run pytest -m "linux"    # Linux Secret Service native integration (under D-Bus)
 
 # Run code style and format checks
 uv run ruff check .
