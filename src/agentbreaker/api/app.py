@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
+from agentbreaker import __version__
 from agentbreaker.api.config import api_settings
 from agentbreaker.api.exceptions import APIError, api_error_handler, generic_exception_handler
 from agentbreaker.api.lifecycle import lifespan
@@ -30,7 +31,7 @@ def create_app() -> FastAPI:
         description=(
             "Local-first AI Security Research and Red Teaming Platform HTTP & WebSocket API."
         ),
-        version="0.1.0.dev1",
+        version=__version__,
         lifespan=lifespan,
         docs_url="/docs" if api_settings.docs_enabled else None,
         redoc_url="/redoc" if api_settings.docs_enabled else None,

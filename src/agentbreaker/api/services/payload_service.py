@@ -4,7 +4,7 @@ from pathlib import Path
 
 from agentbreaker.api.exceptions import ResourceNotFoundError
 from agentbreaker.api.schemas.responses import CategorySummaryResponse, PayloadListItemResponse
-from agentbreaker.attacks.loader import PayloadLoader
+from agentbreaker.attacks.loader import PayloadLoader, get_default_payloads_dir
 from agentbreaker.schemas.enums import AttackCategory, Severity
 from agentbreaker.schemas.payload import AttackPayload
 
@@ -12,8 +12,10 @@ from agentbreaker.schemas.payload import AttackPayload
 class PayloadService:
     """Service providing search, retrieval, and validation of attack payloads."""
 
-    def __init__(self, payloads_dir: Path | str = "payloads") -> None:
-        self.payloads_dir = Path(payloads_dir)
+    def __init__(self, payloads_dir: Path | str | None = None) -> None:
+        self.payloads_dir = (
+            Path(payloads_dir) if payloads_dir is not None else get_default_payloads_dir()
+        )
 
     def _get_all_payloads(self) -> list[AttackPayload]:
         """Load all valid attack payloads from disk."""

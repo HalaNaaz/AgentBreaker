@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends
 
+from agentbreaker import __version__
 from agentbreaker.api.dependencies import get_assessment_service, get_storage, verify_local_auth
 from agentbreaker.api.schemas.responses import (
     SystemCapabilitiesResponse,
@@ -32,7 +33,7 @@ async def get_system_info() -> SystemInfoResponse:
     return SystemInfoResponse(
         name="AgentBreaker",
         organization="AshlynxCyber",
-        version="0.1.0.dev1",
+        version=__version__,
         python_runtime=f"{platform.python_implementation()} {sys.version.split()[0]}",
         os_platform=f"{platform.system()} {platform.release()} ({platform.machine()})",
         registered_connectors=[t.value for t in TargetType],
