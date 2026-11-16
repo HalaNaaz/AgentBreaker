@@ -2,9 +2,11 @@
 
 from agentbreaker.mutators.base import BaseMutator
 from agentbreaker.mutators.exceptions import UnsupportedStrategyError
+from agentbreaker.mutators.strategies.ascii_smuggling import AsciiSmugglingStrategy
 from agentbreaker.mutators.strategies.base64 import Base64Mutator
 from agentbreaker.mutators.strategies.leetspeak import LeetspeakMutator
 from agentbreaker.mutators.strategies.markdown_obfuscation import MarkdownObfuscationMutator
+from agentbreaker.mutators.strategies.multilingual import MultilingualEvasionStrategy
 from agentbreaker.mutators.strategies.rot13 import Rot13Mutator
 
 
@@ -64,10 +66,12 @@ class MutatorRegistry:
 
     @classmethod
     def get_default_registry(cls) -> "MutatorRegistry":
-        """Instantiate a registry populated with the standard 4 mutation strategies."""
+        """Instantiate a registry populated with the standard 6 mutation strategies."""
         registry = cls()
         registry.register(Base64Mutator())
         registry.register(Rot13Mutator())
         registry.register(LeetspeakMutator())
         registry.register(MarkdownObfuscationMutator())
+        registry.register(AsciiSmugglingStrategy())
+        registry.register(MultilingualEvasionStrategy())
         return registry

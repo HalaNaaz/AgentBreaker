@@ -76,7 +76,7 @@ def test_registry_disable_unknown_raises():
 
 
 def test_default_registry_contents():
-    """Verify get_default_registry includes the four standard strategies."""
+    """Verify get_default_registry includes the six standard strategies."""
     reg = MutatorRegistry.get_default_registry()
     strategies = reg.list_strategies()
 
@@ -84,6 +84,8 @@ def test_default_registry_contents():
     assert "rot13" in strategies
     assert "leetspeak" in strategies
     assert "markdown_obfuscation" in strategies
+    assert "ascii_smuggling" in strategies
+    assert "multilingual" in strategies
 
     assert isinstance(reg.get("base64"), Base64Mutator)
     assert isinstance(reg.get("rot13"), Rot13Mutator)
