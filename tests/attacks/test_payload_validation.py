@@ -16,13 +16,13 @@ def test_bundled_payloads_schema_and_safety_validation():
     payloads_dir = Path("payloads")
     payloads = PayloadLoader.load_from_directory(payloads_dir, recursive=True)
 
-    assert len(payloads) >= 30, f"Expected at least 30 payloads, found {len(payloads)}"
+    assert len(payloads) >= 50, f"Expected at least 50 payloads, found {len(payloads)}"
 
     counts = Counter(p.category.value for p in payloads)
-    assert counts["direct_jailbreak"] >= 8
-    assert counts["system_extraction"] >= 7
-    assert counts["indirect_injection"] >= 8
-    assert counts["tool_hijacking"] >= 7
+    assert counts["direct_jailbreak"] >= 13
+    assert counts["system_extraction"] >= 12
+    assert counts["indirect_injection"] >= 13
+    assert counts["tool_hijacking"] >= 12
 
     seen_ids = set()
     for p in payloads:
